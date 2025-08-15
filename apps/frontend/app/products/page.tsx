@@ -6,7 +6,7 @@ import { useCart } from "@/lib/hooks/useCart"
 import { useState } from "react"
 
 export default function ProductsPage() {
-  const { addToCart, isInCart, getItemQuantity } = useCart()
+  const { addToCart, isInCart, getItemQuantity, updateQuantity, cart } = useCart()
   const [products] = useState([
     {
       id: "1",
@@ -61,7 +61,7 @@ export default function ProductsPage() {
       featured: true
     },
     {
-      id: 5,
+      id: "5",
       name: "Фольгированное сердце",
       price: 200,
       comparePrice: 250,
@@ -324,7 +324,12 @@ export default function ProductsPage() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <button
-                                onClick={() => addToCart(product, getItemQuantity(product.id) - 1)}
+                                onClick={() => {
+                                  const item = cart.items.find(i => i.productId === product.id)
+                                  if (!item) return
+                                  const newQty = getItemQuantity(product.id) - 1
+                                  updateQuantity(item.id, newQty)
+                                }}
                                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                               >
                                 <Minus className="w-4 h-4" />
@@ -333,7 +338,12 @@ export default function ProductsPage() {
                                 {getItemQuantity(product.id)}
                               </span>
                               <button
-                                onClick={() => addToCart(product, getItemQuantity(product.id) + 1)}
+                                onClick={() => {
+                                  const item = cart.items.find(i => i.productId === product.id)
+                                  if (!item) return
+                                  const newQty = getItemQuantity(product.id) + 1
+                                  updateQuantity(item.id, newQty)
+                                }}
                                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                               >
                                 <Plus className="w-4 h-4" />

@@ -17,6 +17,26 @@ export interface CartData {
   count: number
 }
 
+const LOCAL_STORAGE_KEY = 'sharikplus_cart'
+
+function readCartFromLocalStorage(): CartData | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+function writeCartToLocalStorage(cart: CartData) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cart))
+  } catch {}
+}
+
 export function useCart() {
   const [cart, setCart] = useState<CartData>({ items: [], total: 0, count: 0 })
   const [loading, setLoading] = useState(false)
@@ -27,12 +47,20 @@ export function useCart() {
     try {
       setLoading(true)
       setError(null)
+
+      // 1) Пробуем локальный снапшот
+      const local = readCartFromLocalStorage()
+      if (local) {
+        setCart(local)
+      }
       
+      // 2) Синхронизируемся с API
       const response = await fetch('/api/cart')
       const data = await response.json()
       
       if (data.success) {
         setCart(data.data)
+        writeCartToLocalStorage(data.data)
       } else {
         setError(data.error || 'Ошибка загрузки корзины')
       }
@@ -73,6 +101,7 @@ export function useCart() {
       
       if (data.success) {
         setCart(data.data)
+        writeCartToLocalStorage(data.data)
         return { success: true, message: data.message }
       } else {
         setError(data.error || 'Ошибка добавления товара')
@@ -106,6 +135,7 @@ export function useCart() {
       
       if (data.success) {
         setCart(data.data)
+        writeCartToLocalStorage(data.data)
         return { success: true, message: data.message }
       } else {
         setError(data.error || 'Ошибка обновления корзины')
@@ -135,6 +165,7 @@ export function useCart() {
       
       if (data.success) {
         setCart(data.data)
+        writeCartToLocalStorage(data.data)
         return { success: true, message: data.message }
       } else {
         setError(data.error || 'Ошибка удаления товара')
@@ -152,7 +183,9 @@ export function useCart() {
 
   // Очистить корзину
   const clearCart = useCallback(() => {
-    setCart({ items: [], total: 0, count: 0 })
+    const empty = { items: [], total: 0, count: 0 }
+    setCart(empty)
+    writeCartToLocalStorage(empty)
   }, [])
 
   // Проверить, есть ли товар в корзине
