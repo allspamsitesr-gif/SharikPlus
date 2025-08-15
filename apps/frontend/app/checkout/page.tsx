@@ -45,9 +45,9 @@ export default function CheckoutPage() {
       setForm(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof CheckoutForm],
+          ...(prev[parent as keyof CheckoutForm] as any),
           [child]: value
-        }
+        } as any
       }))
     } else {
       setForm(prev => ({ ...prev, [field]: value }))
