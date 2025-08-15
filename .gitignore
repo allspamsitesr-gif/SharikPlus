@@ -115,3 +115,4 @@ public/uploads/
 
 # Prisma
 prisma/migrations/
+node_modules
