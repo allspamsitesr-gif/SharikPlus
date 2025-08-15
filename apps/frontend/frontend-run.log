@@ -1,0 +1,18 @@
+
+> @sharikplus/frontend@1.0.0 dev
+> next dev --port 3002
+
+   ▲ Next.js 14.0.0
+   - Local:        http://localhost:3002
+
+npm WARN config This command does not support workspaces.
+ ✓ Ready in 6.8s
+ ○ Compiling /admin/page ...
+ ✓ Compiled /page in 6.7s (496 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export. Please move it to viewport export instead.
+ ⚠ Unsupported metadata themeColor is configured in metadata export. Please move it to viewport export instead.
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:3002". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ⚠ Unsupported metadata viewport is configured in metadata export. Please move it to viewport export instead.
+ ⚠ Unsupported metadata themeColor is configured in metadata export. Please move it to viewport export instead.
+[?25h

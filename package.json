@@ -1,0 +1,60 @@
+{
+  "name": "sharikplus-shop",
+  "version": "1.0.0",
+  "description": "Интернет-магазин воздушных шаров sharikplus.ru - полностью готовый к развёртыванию",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:generate": "cd apps/backend && npm run prisma:generate",
+    "db:migrate": "cd apps/backend && npm run db:migrate",
+    "db:seed": "cd apps/backend && npm run db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "docker:rebuild": "docker-compose build --no-cache",
+    "status": "docker-compose ps",
+    "health": "curl -s http://localhost:3001/health",
+    "admin": "echo 'Админ панель: http://localhost:3001/api/docs'",
+    "shop": "echo 'Интернет-магазин: http://localhost:3002'",
+    "setup": "npm install && npm run docker:up && npm run db:seed",
+    "quick-start": "echo 'Запуск SharikPlus...' && npm run setup && echo 'Готово! Откройте http://localhost:3002'"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "ecommerce",
+    "balloons",
+    "nextjs",
+    "nestjs",
+    "typescript",
+    "prisma",
+    "postgresql",
+    "redis",
+    "docker"
+  ],
+  "author": "SharikPlus Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sharikplus/shop"
+  },
+  "homepage": "https://sharikplus.ru"
+}

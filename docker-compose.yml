@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sharikplus-postgres
+    environment:
+      POSTGRES_DB: sharikplus
+      POSTGRES_USER: sharikplus
+      POSTGRES_PASSWORD: sharikplus123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sharikplus-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sharikplus-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sharikplus-network
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: sharikplus-backend
+    environment:
+      DATABASE_URL: "postgresql://sharikplus:sharikplus123@postgres:5432/sharikplus?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: "your-super-secret-jwt-key-change-in-production"
+      JWT_REFRESH_SECRET: "your-super-secret-refresh-key-change-in-production"
+      JWT_EXPIRES_IN: "15m"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      PORT: 3001
+      NODE_ENV: development
+      UPLOAD_DIR: "./uploads"
+      MAX_FILE_SIZE: 10485760
+      PDF_DOWNLOAD_TTL: 3600
+      PDF_MAX_DOWNLOADS: 3
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./apps/backend/uploads:/app/uploads
+    networks:
+      - sharikplus-network
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    container_name: sharikplus-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NODE_ENV: production
+    ports:
+      - "3002:3000"
+    depends_on:
+      - backend
+    networks:
+      - sharikplus-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sharikplus-network:
+    driver: bridge

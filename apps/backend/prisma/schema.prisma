@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(USER)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+  @@index([email])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  comparePrice Decimal? @db.Decimal(10, 2)
+  sku         String   @unique
+  barcode     String?
+  weight      Decimal? @db.Decimal(8, 3)
+  dimensions  Json?
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  metaTitle   String?
+  metaDescription String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+  @@index([slug])
+  @@index([sku])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  userId        String?
+  status        OrderStatus @default(PLACED)
+  total         Decimal     @db.Decimal(10, 2)
+  subtotal      Decimal     @db.Decimal(10, 2)
+  tax           Decimal     @db.Decimal(10, 2) @default(0)
+  shipping      Decimal     @db.Decimal(10, 2) @default(0)
+  discount      Decimal     @db.Decimal(10, 2) @default(0)
+  
+  // Customer info
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  
+  // Shipping info
+  shippingAddress Json
+  billingAddress  Json?
+  
+  // Payment info (for offline payment)
+  paymentMethod String @default("offline")
+  paymentStatus PaymentStatus @default(PENDING)
+  
+  // Notes
+  notes        String?
+  adminNotes   String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("orders")
+  @@index([orderNumber])
+  @@index([status])
+}
+
+model OrderDownload {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  token     String   @unique
+  filename  String
+  path      String
+  url       String
+  downloads Int      @default(0)
+  maxDownloads Int   @default(3)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("order_downloads")
+  @@index([token])
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        CouponType
+  value       Decimal  @db.Decimal(10, 2)
+  minAmount   Decimal? @db.Decimal(10, 2)
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  startsAt    DateTime?
+  expiresAt   DateTime?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("coupons")
+  @@index([code])
+}
+
+// Enums
+enum UserRole {
+  USER
+  MANAGER
+  ADMIN
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  FULFILLED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
